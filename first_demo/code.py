@@ -1,0 +1,77 @@
+import time
+import board
+import pulseio
+from adafruit_motor import servo
+
+def forward(throttle, seconds):
+    left_servo.throttle = throttle
+    right_servo.throttle = -throttle
+    time.sleep(seconds)
+
+def backward(throttle, seconds):
+    left_servo.throttle = -throttle
+    right_servo.throttle = throttle
+    time.sleep(seconds)
+
+
+def turn_right(throttle, seconds):
+    left_servo.throttle = throttle
+    right_servo.throttle = 0
+    time.sleep(seconds)
+
+def turn_left(throttle, seconds):
+    left_servo.throttle = 0
+    right_servo.throttle = throttle
+    time.sleep(seconds)
+
+def spin_left(seconds):
+    left_servo.throttle = -0.5
+    right_servo.throttle = -0.5
+    time.sleep(seconds)
+
+def spin_right(seconds):
+    left_servo.throttle = 0.5
+    right_servo.throttle = 0.5
+    time.sleep(seconds)
+
+
+# create a PWMOut object on Pin D12 and D11
+pwmL = pulseio.PWMOut(board.D12, frequency=50)
+pwmR = pulseio.PWMOut(board.D11, frequency=50)
+
+# Create a servo object, left_servo.
+left_servo = servo.ContinuousServo(pwmL)
+right_servo = servo.ContinuousServo(pwmR)
+
+# startup delay
+time.sleep(2)
+
+# note throttle range is 1.0 -> -1.0
+side_throttle = 1.0
+side_duration = 2.2
+turn_duration = 0.5
+turn_throttle = 0.5
+
+forward(side_throttle, side_duration)
+turn_right(turn_throttle, turn_duration)
+forward(side_throttle, side_duration)
+turn_right(turn_throttle, turn_duration)
+forward(side_throttle, side_duration)
+turn_right(turn_throttle, turn_duration)
+forward(side_throttle, side_duration)
+spin_left(4)
+
+seesaw_throttle = 0.3
+seesaw_duration = 2
+forward(seesaw_throttle, seesaw_duration)
+backward(seesaw_throttle, seesaw_duration)
+forward(seesaw_throttle, seesaw_duration)
+backward(seesaw_throttle, seesaw_duration)
+forward(seesaw_throttle, seesaw_duration)
+backward(seesaw_throttle, seesaw_duration)
+spin_right(4)
+
+# dp a wheelie
+backward(1.0, 0.5)
+
+
