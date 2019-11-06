@@ -1,4 +1,4 @@
-# mini-robot sonar avoider 1
+# qBot sonar avoider 1
 # 
 # MIT License
 # 
@@ -24,28 +24,51 @@
 # 
 
 """
-mini-robot sonar avoider 2
+qBot sonar avoider
 ===========================================================
 
-Author(s):  Don Korte, Lauren Popovits
-Repository: https://github.com/dnkorte/minirobot
+Author(s):  Don Korte
+Repository: https://github.com/dnkorte/qBot
 
 ItsyBitsy pin connections:
-    to NeoPixel Jewel: 5!       (power this from ItsyBitsy Vhi)
-        12:     Left Servo
-        11:     Right Servo
+        12:     Left Servo 
+        11:     Right Servo 
         10:     HC-s04 Trigger
         9:      HC-s04 Echo
+        7:      PB 1
+        5:      (reserve for neopixel)
+        1:      LED 1
+        0:      PB 2
+        2:      LED 2
+        A5:     piezo
 """
 import time
 import board
+import digitalio
 import pulseio
 from adafruit_motor import servo
+import adafruit_hcsr04
 
-def forward(throttle, seconds):
+def forward_no_check(throttle, seconds):
     left_servo.throttle = throttle
     right_servo.throttle = -throttle
     time.sleep(seconds)
+
+def forward(throttle, seconds):
+    for i in range(seconds * 10):
+        left_servo.throttle = throttle
+        right_servo.throttle = -throttle
+        if check_sonar() < 10:
+            # if saw something close, then backup for a while
+            left_servo.throttle = -1
+            right_servo.throttle = 1
+            time.sleep(1)
+            # then go forward and turn a little bit
+            left_servo.throttle = 1
+            right_servo.throttle = 0
+            time.sleep(0.5)
+
+        time.sleep(0.1)
 
 def backward(throttle, seconds):
     left_servo.throttle = -throttle
@@ -73,6 +96,25 @@ def spin_right(seconds):
     right_servo.throttle = 0.5
     time.sleep(seconds)
 
+def beep(duration):
+    beeper.value = True
+    time.sleep(duration)
+    beeper.value = False
+
+def check_sonar():
+    try: 
+        x = sonar.distance
+    except RuntimeError:
+        x = 999
+    return x
+
+# print("starting")
+
+beeper = digitalio.DigitalInOut(board.A5)
+beeper.direction = digitalio.Direction.OUTPUT
+beeper.value = False
+
+# print("initialized beeper")
 
 # create a PWMOut object on Pin D12 and D11
 pwmL = pulseio.PWMOut(board.D12, frequency=50)
@@ -82,35 +124,23 @@ pwmR = pulseio.PWMOut(board.D11, frequency=50)
 left_servo = servo.ContinuousServo(pwmL)
 right_servo = servo.ContinuousServo(pwmR)
 
+# create object for sonar device
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D9, timeout=1.0)
+
 # startup delay
-time.sleep(2)
+for i in range(5):
+    beep(0.25)
+    time.sleep(0.75)
 
 # note throttle range is 1.0 -> -1.0
 side_throttle = 1.0
-side_duration = 2.2
-turn_duration = 0.5
+side_duration = 8
+turn_duration = 0.8
 turn_throttle = 0.5
 
-forward(side_throttle, side_duration)
-turn_right(turn_throttle, turn_duration)
-forward(side_throttle, side_duration)
-turn_right(turn_throttle, turn_duration)
-forward(side_throttle, side_duration)
-turn_right(turn_throttle, turn_duration)
-forward(side_throttle, side_duration)
-spin_left(4)
+for i in range(10):
+    forward(side_throttle, side_duration)
+    turn_right(turn_throttle, turn_duration)
 
-seesaw_throttle = 0.3
-seesaw_duration = 2
-forward(seesaw_throttle, seesaw_duration)
-backward(seesaw_throttle, seesaw_duration)
-forward(seesaw_throttle, seesaw_duration)
-backward(seesaw_throttle, seesaw_duration)
-forward(seesaw_throttle, seesaw_duration)
-backward(seesaw_throttle, seesaw_duration)
+# all done, so bow and quit
 spin_right(4)
-
-# dp a wheelie
-backward(1.0, 0.5)
-
-

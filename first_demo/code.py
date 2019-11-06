@@ -1,4 +1,4 @@
-# mini-robot simple demo
+# qBot simple demo
 # 
 # MIT License
 # 
@@ -24,14 +24,13 @@
 # 
 
 """
-mini-robot simple demo
+qBot simple demo
 ===========================================================
 
 Author(s):  Don Korte
-Repository: https://github.com/dnkorte/minirobot
+Repository: https://github.com/dnkorte/qBot
 
 ItsyBitsy pin connections:
-    to NeoPixel Jewel: 5!       (power this from ItsyBitsy Vhi)
         12:     Left Servo
         11:     Right Servo
 """
