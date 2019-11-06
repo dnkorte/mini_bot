@@ -49,9 +49,7 @@ import pulseio
 from adafruit_motor import servo
 import adafruit_hcsr04
 import random
-
-for i in range(10):
-    print(random.randint(1,10))
+import neopixel
 
 def forward_no_check(throttle, seconds):
     left_servo.throttle = throttle
@@ -62,19 +60,42 @@ def forward(throttle, seconds):
     for i in range(seconds * 10):
         left_servo.throttle = throttle
         right_servo.throttle = -throttle
+        neopixels[0] = (0, 255, 0)
+        neopixels[1] = (0, 255, 0)
+        neopixels[4] = (0, 255, 0)
+        neopixels.show()
         if check_sonar() < 10:
             # if saw something close, then backup for a while
             left_servo.throttle = -1
             right_servo.throttle = 1
+            neopixels[0] = (255, 0, 0)
+            neopixels[1] = (255, 0, 0)
+            neopixels[4] = (255, 0, 0)
+            neopixels.show()
             time.sleep(1)
             # then go forward and turn a little bit with turn in random direction
             if (random.randint(0,10) > 4):
                 left_servo.throttle = 1
                 right_servo.throttle = 1
+                neopixels[0] = (255, 255, 0)
+                neopixels[1] = (255, 255, 0)
+                neopixels[4] = (255, 255, 0)
+                neopixels[2] = (255, 255, 0)
+                neopixels[3] = (255, 255, 0)
             else:
                 left_servo.throttle = -1
                 right_servo.throttle = -1
+                neopixels[0] = (0, 0, 255)
+                neopixels[1] = (0, 0, 255)
+                neopixels[4] = (0, 0, 255)
+                neopixels[5] = (0, 0, 255)
+                neopixels[6] = (0, 0, 255)
+            neopixels.show()
             time.sleep(0.5)
+            neopixels[2] = (0, 0, 0)
+            neopixels[3] = (0, 0, 0)
+            neopixels[5] = (0, 0, 0)
+            neopixels[6] = (0, 0, 0)
 
         time.sleep(0.1)
 
@@ -116,13 +137,10 @@ def check_sonar():
         x = 999
     return x
 
-# print("starting")
-
+# setup beeper
 beeper = digitalio.DigitalInOut(board.A5)
 beeper.direction = digitalio.Direction.OUTPUT
 beeper.value = False
-
-# print("initialized beeper")
 
 # create a PWMOut object on Pin D12 and D11
 pwmL = pulseio.PWMOut(board.D12, frequency=50)
@@ -135,10 +153,22 @@ right_servo = servo.ContinuousServo(pwmR)
 # create object for sonar device
 sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D9, timeout=1.0)
 
+# setup for NeoPixels (RGB) ########################################################
+NUMPIXELS = 7
+ORDER = neopixel.GRB
+neopixels = neopixel.NeoPixel(board.D5, NUMPIXELS, brightness=0.2, auto_write=False, pixel_order=ORDER)
+
 # startup delay
 for i in range(5):
+    neopixels[i+2] = (255, 255, 0)
+    neopixels.show()
     beep(0.25)
     time.sleep(0.75)
+
+# user is ready, so turn off all the neopixels 
+for i in range(NUMPIXELS):      
+    neopixels[i] = (0, 0, 0)
+neopixels.show()
 
 # note throttle range is 1.0 -> -1.0
 side_throttle = 1.0
