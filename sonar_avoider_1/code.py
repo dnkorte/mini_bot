@@ -37,9 +37,9 @@ ItsyBitsy pin connections:
         9:      HC-s04 Echo
         7:      PB 1
         5:      (reserve for neopixel)
-        1:      LED 1
-        0:      PB 2
-        2:      LED 2
+        1:      PB 2
+        0:      
+        2:      
         A5:     piezo
 """
 import time
@@ -48,6 +48,10 @@ import digitalio
 import pulseio
 from adafruit_motor import servo
 import adafruit_hcsr04
+import random
+
+for i in range(10):
+    print(random.randint(1,10))
 
 def forward_no_check(throttle, seconds):
     left_servo.throttle = throttle
@@ -63,9 +67,13 @@ def forward(throttle, seconds):
             left_servo.throttle = -1
             right_servo.throttle = 1
             time.sleep(1)
-            # then go forward and turn a little bit
-            left_servo.throttle = 1
-            right_servo.throttle = 0
+            # then go forward and turn a little bit with turn in random direction
+            if (random.randint(0,10) > 4):
+                left_servo.throttle = 1
+                right_servo.throttle = 1
+            else:
+                left_servo.throttle = -1
+                right_servo.throttle = -1
             time.sleep(0.5)
 
         time.sleep(0.1)
