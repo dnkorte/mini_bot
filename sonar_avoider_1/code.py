@@ -1,4 +1,4 @@
-# qBot sonar avoider 1
+# minibot sonar avoider 1
 # 
 # MIT License
 # 
@@ -24,11 +24,11 @@
 # 
 
 """
-qBot sonar avoider
+minibot sonar avoider
 ===========================================================
 
 Author(s):  Don Korte
-Repository: https://github.com/dnkorte/qBot
+Repository: https://github.com/dnkorte/minibot
 
 ItsyBitsy pin connections:
         12:     Left Servo 
@@ -36,7 +36,7 @@ ItsyBitsy pin connections:
         10:     HC-s04 Trigger
         9:      HC-s04 Echo
         7:      PB 1
-        5:      (reserve for neopixel)
+        5:      NeoPixel
         1:      PB 2
         0:      
         2:      
@@ -51,15 +51,10 @@ import adafruit_hcsr04
 import random
 import neopixel
 
-def forward_no_check(throttle, seconds):
-    left_servo.throttle = throttle
-    right_servo.throttle = -throttle
-    time.sleep(seconds)
-
-def forward(throttle, seconds):
+def drive(seconds):
     for i in range(seconds * 10):
-        left_servo.throttle = throttle
-        right_servo.throttle = -throttle
+        left_servo.throttle = 1
+        right_servo.throttle = -1
         neopixels[0] = (0, 255, 0)
         neopixels[1] = (0, 255, 0)
         neopixels[4] = (0, 255, 0)
@@ -98,6 +93,11 @@ def forward(throttle, seconds):
             neopixels[6] = (0, 0, 0)
 
         time.sleep(0.1)
+
+def forward(throttle, seconds):
+    left_servo.throttle = throttle
+    right_servo.throttle = -throttle
+    time.sleep(seconds)
 
 def backward(throttle, seconds):
     left_servo.throttle = -throttle
@@ -177,7 +177,7 @@ turn_duration = 0.8
 turn_throttle = 0.5
 
 for i in range(10):
-    forward(side_throttle, side_duration)
+    drive(side_duration)
     turn_right(turn_throttle, turn_duration)
 
 # all done, so bow and quit

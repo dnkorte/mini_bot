@@ -1,4 +1,4 @@
-# qBot simple demo
+# minibot simple demo
 # 
 # MIT License
 # 
@@ -24,11 +24,11 @@
 # 
 
 """
-qBot simple demo
+minibot simple demo
 ===========================================================
 
 Author(s):  Don Korte
-Repository: https://github.com/dnkorte/qBot
+Repository: https://github.com/dnkorte/minibot
 
 ItsyBitsy pin connections:
         12:     Left Servo
