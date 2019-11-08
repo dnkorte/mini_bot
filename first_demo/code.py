@@ -1,4 +1,7 @@
 # minibot simple demo
+#
+# Author(s):  Don Korte
+# github: https://github.com/dnkorte/mini_bot.git
 # 
 # MIT License
 # 
@@ -24,16 +27,13 @@
 # 
 
 """
-minibot simple demo
 ===========================================================
-
-Author(s):  Don Korte
-Repository: https://github.com/dnkorte/minibot
-
 ItsyBitsy pin connections:
         12:     Left Servo
         11:     Right Servo
+==========================================================       
 """
+
 import time
 import board
 import pulseio

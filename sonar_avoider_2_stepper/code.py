@@ -1,5 +1,8 @@
 # minibot sonar avoider 2 stepper
 # 
+# Author(s):  Don Korte
+# github: https://github.com/dnkorte/mini_bot.git
+# 
 # MIT License
 # 
 # Copyright (c) 2019 Don Korte
@@ -22,13 +25,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # 
+
 """
-minibot sonar avoider 2 stepper
 ===========================================================
-
-Author(s):  Don Korte
-Repository: https://github.com/dnkorte/minibot
-
 ItsyBitsy pin connections:
         12:     Left Servo 
         11:     Right Servo 
@@ -40,7 +39,9 @@ ItsyBitsy pin connections:
         0:      
         2:      
         A5:     piezo
+===========================================================
 """
+
 import time
 import board
 import digitalio
