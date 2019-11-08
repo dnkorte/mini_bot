@@ -1,4 +1,4 @@
-# minibot sonar avoider 1
+# minibot sonar avoider 2 stepper
 # 
 # MIT License
 # 
@@ -22,9 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # 
-
 """
-minibot sonar avoider
+minibot sonar avoider 2 stepper
 ===========================================================
 
 Author(s):  Don Korte
