@@ -1,5 +1,5 @@
-# minibot sonar avoider 1
-#
+# minibot sonar avoider 2 stepper
+# 
 # Author(s):  Don Korte
 # github: https://github.com/dnkorte/mini_bot.git
 # 
@@ -28,17 +28,21 @@
 
 """
 ===========================================================
+
 ItsyBitsy pin connections:
-        12:     Left Servo 
-        11:     Right Servo 
+        13:     motor 2 (R) A
+        12:     motor 1 (L) A
+        11:     motor 1 (L) B
         10:     HC-s04 Trigger
-        9:      
+        9:      motor 2 (R) B
         7:      HC-s04 Echo
         5:      NeoPixel
-        1:      (PB 2)
+        1:      
         0:      
         2:      
         A5:     piezo
+        A1:     motor 2 (R) A
+        A2:     motor 2 (R) B
 
 NeoPixel connection:
         DataIn: to pin 5 on ItsyBitsy (yellow)
@@ -47,8 +51,8 @@ NeoPixel connection:
         (note that 3 pin header is in order yellow, red, black)
 
 Libraries needed:
-    adafruit_bus_device
-    adafruit_motor
+    adafruit_bus_device (folder)
+    adafruit_motor (folder)
     adafruit_button
     adafruit_dotstar
     adafruit_hcsr04
@@ -60,23 +64,23 @@ import time
 import board
 import digitalio
 import pulseio
-from adafruit_motor import servo
+from adafruit_motor import motor
 import adafruit_hcsr04
 import random
 import neopixel
 
 def drive(seconds):
     for i in range(seconds * 10):
-        left_servo.throttle = 1
-        right_servo.throttle = -1
+        left_motor.throttle = 1
+        right_motor.throttle = -1
         neopixels[0] = (0, 255, 0)
         neopixels[1] = (0, 255, 0)
         neopixels[4] = (0, 255, 0)
         neopixels.show()
         if check_sonar() < 10:
             # if saw something close, then backup for a while
-            left_servo.throttle = -1
-            right_servo.throttle = 1
+            left_motor.throttle = -1
+            right_motor.throttle = 1
             neopixels[0] = (255, 0, 0)
             neopixels[1] = (255, 0, 0)
             neopixels[4] = (255, 0, 0)
@@ -84,16 +88,16 @@ def drive(seconds):
             time.sleep(1)
             # then go forward and turn a little bit with turn in random direction
             if (random.randint(0,10) > 4):
-                left_servo.throttle = 1
-                right_servo.throttle = 1
+                left_motor.throttle = 1
+                right_motor.throttle = 1
                 neopixels[0] = (255, 255, 0)
                 neopixels[1] = (255, 255, 0)
                 neopixels[4] = (255, 255, 0)
                 neopixels[2] = (255, 255, 0)
                 neopixels[3] = (255, 255, 0)
             else:
-                left_servo.throttle = -1
-                right_servo.throttle = -1
+                left_motor.throttle = -1
+                right_motor.throttle = -1
                 neopixels[0] = (0, 0, 255)
                 neopixels[1] = (0, 0, 255)
                 neopixels[4] = (0, 0, 255)
@@ -109,34 +113,34 @@ def drive(seconds):
         time.sleep(0.1)
 
 def forward(throttle, seconds):
-    left_servo.throttle = throttle
-    right_servo.throttle = -throttle
+    left_motor.throttle = throttle
+    right_motor.throttle = -throttle
     time.sleep(seconds)
 
 def backward(throttle, seconds):
-    left_servo.throttle = -throttle
-    right_servo.throttle = throttle
+    left_motor.throttle = -throttle
+    right_motor.throttle = throttle
     time.sleep(seconds)
 
 
 def turn_right(throttle, seconds):
-    left_servo.throttle = throttle
-    right_servo.throttle = 0
+    left_motor.throttle = throttle
+    right_motor.throttle = 0
     time.sleep(seconds)
 
 def turn_left(throttle, seconds):
-    left_servo.throttle = 0
-    right_servo.throttle = throttle
+    left_motor.throttle = 0
+    right_motor.throttle = throttle
     time.sleep(seconds)
 
 def spin_left(seconds):
-    left_servo.throttle = -0.5
-    right_servo.throttle = -0.5
+    left_motor.throttle = -0.5
+    right_motor.throttle = -0.5
     time.sleep(seconds)
 
 def spin_right(seconds):
-    left_servo.throttle = 0.5
-    right_servo.throttle = 0.5
+    left_motor.throttle = 0.5
+    right_motor.throttle = 0.5
     time.sleep(seconds)
 
 def beep(duration):
@@ -156,13 +160,15 @@ beeper = digitalio.DigitalInOut(board.A5)
 beeper.direction = digitalio.Direction.OUTPUT
 beeper.value = False
 
-# create a PWMOut object on Pin D12 and D11
-pwmL = pulseio.PWMOut(board.D12, frequency=50)
-pwmR = pulseio.PWMOut(board.D11, frequency=50)
+# create PWMOut objects for motors
+pwmA_m1 = pulseio.PWMOut(board.D12, frequency=50)
+pwmB_m1 = pulseio.PWMOut(board.D11, frequency=50)
+pwmA_m2 = pulseio.PWMOut(board.D13, frequency=50)
+pwmB_m2 = pulseio.PWMOut(board.D9, frequency=50)
 
-# Create a servo object, left_servo.
-left_servo = servo.ContinuousServo(pwmL)
-right_servo = servo.ContinuousServo(pwmR)
+# then create the motor objects
+left_motor = motor.DCMotor(pwmA_m1, pwmB_m1)
+right_motor = motor.DCMotor(pwmA_m2, pwmB_m2)
 
 # create object for sonar device
 sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D7, timeout=1.0)
@@ -184,6 +190,24 @@ for i in range(NUMPIXELS):
     neopixels[i] = (0, 0, 0)
 neopixels.show()
 
+while False:
+    # note with 4.8v supply, the motor starts turning at 0.35 - 0.4 throttle
+    for i in range(20, 100, 5):
+        throttle = i/100
+        left_motor.throttle = throttle
+        print(str(throttle))
+        time.sleep(1)
+
+    while(True):
+        # for i in range(STEPS_PER_REV):
+        #    kit.stepper1.onestep(direction=FORWARD, style=SINGLE)
+        left_motor.throttle = 1
+        time.sleep(3)
+        left_motor.throttle = 0
+        time.sleep(1)
+        left_motor.throttle = -1
+        time.sleep(3)
+
 # note throttle range is 1.0 -> -1.0
 side_throttle = 1.0
 side_duration = 8
@@ -195,4 +219,4 @@ for i in range(10):
     turn_right(turn_throttle, turn_duration)
 
 # all done, so bow and quit
-spin_right(4)
+# spin_right(4)

@@ -36,8 +36,8 @@ ItsyBitsy pin connections:
         12:     (Left Servo) 
         11:     (Right Servo) 
         10:     HC-s04 Trigger
-        9:      HC-s04 Echo
-        7:      
+        9:      
+        7:      HC-s04 Echo
         5:      NeoPixel
         1:      
         0:      
@@ -181,7 +181,7 @@ beeper.value = False
 kit = MotorKit(steppers_microsteps=2)
 
 # create object for sonar device
-sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D9, timeout=1.0)
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D7, timeout=1.0)
 
 # setup for NeoPixels (RGB) ########################################################
 NUMPIXELS = 7
