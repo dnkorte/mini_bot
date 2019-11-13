@@ -33,12 +33,26 @@ ItsyBitsy pin connections:
         11:     Right Servo 
         10:     HC-s04 Trigger
         9:      HC-s04 Echo
-        7:      PB 1
+        7:      (PB 1)
         5:      NeoPixel
-        1:      PB 2
+        1:      (PB 2)
         0:      
         2:      
         A5:     piezo
+
+NeoPixel connection:
+        DataIn: to pin 5 on ItsyBitsy (yellow)
+        +5v:    to +5v from battery (red)
+        GND:    to ground (black)
+        (note that 3 pin header is in order yellow, red, black)
+
+Libraries needed:
+    adafruit_bus_device
+    adafruit_motor
+    adafruit_button
+    adafruit_dotstar
+    adafruit_hcsr04
+    neopixel
 ===========================================================
 """
 

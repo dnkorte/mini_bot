@@ -28,17 +28,50 @@
 
 """
 ===========================================================
+
+NOTE that this program requires an M4 class processor due to memory usage
+NOTE ALSO: the geared down amazon stepper motor is WAY too slow to make this useful !!
+
 ItsyBitsy pin connections:
-        12:     Left Servo 
-        11:     Right Servo 
+        12:     (Left Servo) 
+        11:     (Right Servo) 
         10:     HC-s04 Trigger
         9:      HC-s04 Echo
-        7:      PB 1
+        7:      
         5:      NeoPixel
-        1:      PB 2
+        1:      
         0:      
         2:      
         A5:     piezo
+        SCL:    to SCL on Stepper Featherwing (yellow)
+        SDA:    to SDA on Stepper Featherwing (blue)
+
+NeoPixel connection:
+        DataIn: to pin 5 on ItsyBitsy (yellow)
+        +5v:    to +5v from battery (red)
+        GND:    to ground (black)
+        (note that 3 pin header is in order yellow, red, black)
+
+Stepper Featherwing connections 
+        VBAT:   to +5v from battery (red)
+        +3V:    to 3v bus (sourced by ItsyBitsy 3v pin) (orange)
+        GND:    to ground (black) (note be sure to jumper the logic gnd and motor gnd on board)
+        SCL:    to SCL on ItsyBitsy (yellow)
+        SDA:    to SDA on SItsyBitsy (blue)
+        (note that 5 pin header is in order: red, orange, black, blue, yellow)
+        Left Stepper: to M1/M2
+        Right Stepper: to M3/M4
+
+Libraries needed:
+    adafruit_bus_device (folder)
+    adafruit_motor (folder)
+    adafruit_register (unique to stepper version) (folder)
+    adafruit_button
+    adafruit_dotstar
+    adafruit_hcsr04
+    adafruit_motorkit (unique to stepper version)
+    adafruit_pca9685 (unique to stepper version)
+    neopixel
 ===========================================================
 """
 
@@ -46,7 +79,9 @@ import time
 import board
 import digitalio
 import pulseio
-from adafruit_motor import servo
+# from adafruit_motor import servo
+from adafruit_motorkit import MotorKit
+# from adafruit_motor import stepper
 import adafruit_hcsr04
 import random
 import neopixel
@@ -142,13 +177,8 @@ beeper = digitalio.DigitalInOut(board.A5)
 beeper.direction = digitalio.Direction.OUTPUT
 beeper.value = False
 
-# create a PWMOut object on Pin D12 and D11
-pwmL = pulseio.PWMOut(board.D12, frequency=50)
-pwmR = pulseio.PWMOut(board.D11, frequency=50)
-
-# Create a servo object, left_servo.
-left_servo = servo.ContinuousServo(pwmL)
-right_servo = servo.ContinuousServo(pwmR)
+# setup stepper drivers
+kit = MotorKit(steppers_microsteps=2)
 
 # create object for sonar device
 sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D10, echo_pin=board.D9, timeout=1.0)
@@ -170,6 +200,30 @@ for i in range(NUMPIXELS):
     neopixels[i] = (0, 0, 0)
 neopixels.show()
 
+# Constants that specify the direction and style of steps.
+FORWARD = const(1)
+"""Step forward"""
+BACKWARD = const(2)
+""""Step backward"""
+SINGLE = const(1)
+"""Step so that each step only activates a single coil"""
+DOUBLE = const(2)
+"""Step so that each step only activates two coils to produce more torque."""
+INTERLEAVE = const(3)
+"""Step half a step to alternate between single coil and double coil steps."""
+MICROSTEP = const(4)
+"""Step a fraction of a step by partially activating two neighboring coils. Step size is determined
+   by ``microsteps`` constructor argument."""
+# natively 5.625 degrees per step, divided by 64 gear ratio   
+STEPS_PER_REV = 64 * 64
+
+while(True):
+    for i in range(STEPS_PER_REV):
+        kit.stepper1.onestep(direction=FORWARD, style=SINGLE)
+
+    for i in range(STEPS_PER_REV):
+        kit.stepper1.onestep(direction=BACKWARD, style=DOUBLE)
+
 # note throttle range is 1.0 -> -1.0
 side_throttle = 1.0
 side_duration = 8
@@ -177,8 +231,9 @@ turn_duration = 0.8
 turn_throttle = 0.5
 
 for i in range(10):
-    drive(side_duration)
-    turn_right(turn_throttle, turn_duration)
+    # drive(side_duration)
+    # turn_right(turn_throttle, turn_duration)
+    pass
 
 # all done, so bow and quit
-spin_right(4)
+# spin_right(4)

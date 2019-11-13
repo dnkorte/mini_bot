@@ -31,6 +31,12 @@
 ItsyBitsy pin connections:
         12:     Left Servo
         11:     Right Servo
+
+Libraries needed:
+    adafruit_bus_device
+    adafruit_motor
+    adafruit_button
+    adafruit_dotstar
 ==========================================================       
 """
 
